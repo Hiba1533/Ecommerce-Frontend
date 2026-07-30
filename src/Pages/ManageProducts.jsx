@@ -68,34 +68,57 @@ function ManageProducts() {
   }
 
   return (
-    <div className="container">
-      <h1>Manage Store</h1>
-
-      <div className="card">
-        <h2>Add Category</h2>
-        <input
-          type="text"
-          placeholder="Category Name"
-          value={categoryName}
-          onChange={(e) => setCategoryName(e.target.value)}
-        />
-        <button onClick={addCategory}>Add Category</button>
+    <div className="page-container">
+      <div className="page-heading">
+        <h1>Manage Store</h1>
+        <p>Add new categories and products to the catalogue.</p>
       </div>
 
-      <div className="card">
-        <h2>Add Product</h2>
-        <input type="text" placeholder="Product Name" value={name} onChange={(e) => setName(e.target.value)} />
-        <input type="text" placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)} />
-        <input type="number" placeholder="Price" value={price} onChange={(e) => setPrice(e.target.value)} />
-        <input type="number" placeholder="Stock" value={stock} onChange={(e) => setStock(e.target.value)} />
+      <div className="dashboard-layout">
+        <div className="dashboard-card">
+          <h3>Add Category</h3>
+          <label>Category Name</label>
+          <input
+            type="text"
+            placeholder="e.g. Snacks"
+            value={categoryName}
+            onChange={(e) => setCategoryName(e.target.value)}
+          />
+          <button className="btn btn-primary btn-block" onClick={addCategory}>
+            Add Category
+          </button>
+        </div>
 
-        <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)}>
-          {categories.map((cat) => (
-            <option key={cat.id} value={cat.id}>{cat.name}</option>
-          ))}
-        </select>
+        <div className="dashboard-card">
+          <h3>Add Product</h3>
+          <label>Product Name</label>
+          <input type="text" placeholder="Product name" value={name} onChange={(e) => setName(e.target.value)} />
 
-        <button onClick={addProduct}>Add Product</button>
+          <label>Description</label>
+          <input type="text" placeholder="Short description" value={description} onChange={(e) => setDescription(e.target.value)} />
+
+          <div className="form-row">
+            <div>
+              <label>Price</label>
+              <input type="number" placeholder="0" value={price} onChange={(e) => setPrice(e.target.value)} />
+            </div>
+            <div>
+              <label>Stock</label>
+              <input type="number" placeholder="0" value={stock} onChange={(e) => setStock(e.target.value)} />
+            </div>
+          </div>
+
+          <label>Category</label>
+          <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)}>
+            {categories.map((cat) => (
+              <option key={cat.id} value={cat.id}>{cat.name}</option>
+            ))}
+          </select>
+
+          <button className="btn btn-primary btn-block" onClick={addProduct}>
+            Add Product
+          </button>
+        </div>
       </div>
     </div>
   )

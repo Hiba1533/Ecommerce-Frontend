@@ -32,28 +32,47 @@ function Login() {
   }
 
   return (
-    <div className="center-page">
-      <h1>E-Commerce Store</h1>
-      <div className="card">
-        <h2>Login</h2>
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
+    <div className="auth-page">
+      <div className="auth-panel">
+        <h1>Everyday essentials,<br />sorted in one cart.</h1>
+        <p>Browse products, track orders, and check out — all in one place.</p>
 
-        <div className="btn-block">
-          <button onClick={handleLogin}>Login</button>
+        <ul className="auth-feature-list">
+          <li>Save items to your cart</li>
+          <li>Track every order in real time</li>
+          <li>Checkout in a couple of clicks</li>
+        </ul>
+      </div>
+
+      <div className="auth-form-wrap">
+        <div className="auth-card">
+          <h2>Welcome back</h2>
+          <p className="auth-subtitle">Log in to keep shopping</p>
+
+          <label>Email</label>
+          <input
+            type="email"
+            placeholder="you@example.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+
+          <label>Password</label>
+          <input
+            type="password"
+            placeholder="••••••••"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+
+          <button className="btn btn-primary btn-block" onClick={handleLogin}>
+            Log In
+          </button>
+
+          <p className="auth-switch">
+            New to Commi? <Link to="/register">Create an account</Link>
+          </p>
         </div>
-
-        <p>Don't have an account? <Link to="/register">Register</Link></p>
       </div>
     </div>
   )

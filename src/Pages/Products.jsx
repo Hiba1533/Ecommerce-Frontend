@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { BASE_URL, getUserId, getToken } from '../api.js'
+import { BASE_URL, getUserId, getToken, formatPrice } from '../api.js'
 
 function Products() {
   const [products, setProducts] = useState([])
   const [quantities, setQuantities] = useState({})
+  const [activeCategory, setActiveCategory] = useState("All")
   const navigate = useNavigate()
   const userId = getUserId()
 
@@ -27,12 +28,27 @@ function Products() {
     setProducts(data)
   }
 
-  function handleQtyChange(productId, value) {
-    setQuantities({ ...quantities, [productId]: value })
+  const categories = useMemo(() => {
+    const names = [...new Set(products.map((p) => p.category.name))]
+    return ["All", ...names]
+  }, [products])
+
+  const visibleProducts = activeCategory === "All"
+    ? products
+    : products.filter((p) => p.category.name === activeCategory)
+
+  function getQty(productId) {
+    return quantities[productId] || 1
+  }
+
+  function changeQty(productId, delta, stock) {
+    const current = getQty(productId)
+    const next = Math.min(Math.max(current + delta, 1), stock || current + delta)
+    setQuantities({ ...quantities, [productId]: next })
   }
 
   async function addToCart(productId) {
-    const quantity = quantities[productId] || 1
+    const quantity = getQty(productId)
 
     const response = await fetch(
       `${BASE_URL}/cart/items?userId=${userId}&productId=${productId}&quantity=${quantity}`,
@@ -43,40 +59,61 @@ function Products() {
     )
 
     if (response.ok) {
-      alert("Product Added Successfully")
+      alert("Added to cart")
     } else {
       alert(await response.text())
     }
   }
 
   return (
-    <div className="container">
-      <h1>Products</h1>
+    <div className="page-container">
+      <div className="page-heading">
+        <h1>Shop All Products</h1>
+        <p>Fresh picks, restocked daily.</p>
+      </div>
 
-      <div className="grid">
-        {products.map((product) => (
-          <div className="card product-card" key={product.id}>
-            <h2>{product.name}</h2>
-            <p>{product.description}</p>
-            <p><b>Price:</b> Rs. {product.price}</p>
-            <p><b>Stock:</b> {product.stock}</p>
-            <p><b>Category:</b> {product.category.name}</p>
-
-            <input
-              type="number"
-              min="1"
-              value={quantities[product.id] || 1}
-              onChange={(e) => handleQtyChange(product.id, e.target.value)}
-            />
-
-            <button onClick={() => addToCart(product.id)}>Add To Cart</button>
-          </div>
+      <div className="category-pills">
+        {categories.map((name) => (
+          <button
+            key={name}
+            className={`pill ${activeCategory === name ? "pill-active" : ""}`}
+            onClick={() => setActiveCategory(name)}
+          >
+            {name}
+          </button>
         ))}
       </div>
 
-      <div className="action-bar">
-        <button onClick={() => navigate("/cart")}>View Cart</button>
-        <button onClick={() => navigate("/manage-products")}>Manage Products</button>
+      <div className="product-grid">
+        {visibleProducts.map((product) => (
+          <div className="product-card" key={product.id}>
+            {product.stock === 0 && (
+              <span className="ribbon ribbon-danger">Sold Out</span>
+            )}
+            {product.stock > 0 && product.stock <= 5 && (
+              <span className="ribbon ribbon-warning">Only {product.stock} left</span>
+            )}
+
+            <span className="product-category">{product.category.name}</span>
+            <h3>{product.name}</h3>
+            <p className="product-desc">{product.description}</p>
+            <p className="product-price">Rs. {formatPrice(product.price)}</p>
+
+            <div className="stepper">
+              <button onClick={() => changeQty(product.id, -1, product.stock)} disabled={getQty(product.id) <= 1}>−</button>
+              <span>{getQty(product.id)}</span>
+              <button onClick={() => changeQty(product.id, 1, product.stock)} disabled={getQty(product.id) >= product.stock}>+</button>
+            </div>
+
+            <button
+              className="btn btn-primary btn-block"
+              disabled={product.stock === 0}
+              onClick={() => addToCart(product.id)}
+            >
+              {product.stock === 0 ? "Sold Out" : "Add to Cart"}
+            </button>
+          </div>
+        ))}
       </div>
     </div>
   )

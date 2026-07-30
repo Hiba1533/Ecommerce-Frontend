@@ -27,20 +27,43 @@ function Register() {
   }
 
   return (
-    <div className="center-page">
-      <h1>E-Commerce Store</h1>
-      <div className="card">
-        <h2>Create Account</h2>
-        <input type="text" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} />
-        <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
-        <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
-        <input type="text" placeholder="Phone Number" value={phone} onChange={(e) => setPhone(e.target.value)} />
+    <div className="auth-page">
+      <div className="auth-panel">
+        <h1>Join Commi and<br />shop smarter.</h1>
+        <p>Create an account to save your cart and track every order.</p>
 
-        <div className="btn-block">
-          <button className="btn-success" onClick={handleRegister}>Register</button>
+        <ul className="auth-feature-list">
+          <li>Free to join, ready in a minute</li>
+          <li>Your cart is saved to your account</li>
+          <li>See order and payment status anytime</li>
+        </ul>
+      </div>
+
+      <div className="auth-form-wrap">
+        <div className="auth-card">
+          <h2>Create your account</h2>
+          <p className="auth-subtitle">Takes less than a minute</p>
+
+          <label>Username</label>
+          <input type="text" placeholder="Your name" value={username} onChange={(e) => setUsername(e.target.value)} />
+
+          <label>Email</label>
+          <input type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} />
+
+          <label>Password</label>
+          <input type="password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} />
+
+          <label>Phone Number</label>
+          <input type="text" placeholder="03xx-xxxxxxx" value={phone} onChange={(e) => setPhone(e.target.value)} />
+
+          <button className="btn btn-primary btn-block" onClick={handleRegister}>
+            Create Account
+          </button>
+
+          <p className="auth-switch">
+            Already have an account? <Link to="/">Log in</Link>
+          </p>
         </div>
-
-        <p>Already have an account? <Link to="/">Login</Link></p>
       </div>
     </div>
   )

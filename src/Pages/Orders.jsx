@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { BASE_URL, getUserId, authHeaders } from '../api.js'
+import { BASE_URL, getUserId, authHeaders, formatPrice } from '../api.js'
 
 function Orders() {
   const [name, setName] = useState("")
@@ -42,7 +42,7 @@ function Orders() {
       return
     }
     const data = await response.json()
-    setOrders(data)
+    setOrders(data.slice().reverse())
   }
 
   async function placeOrder() {
@@ -79,41 +79,65 @@ function Orders() {
   }
 
   return (
-    <div className="container">
-      <h1>Place Order</h1>
+    <div className="page-container">
+      <div className="page-heading">
+        <h1>Checkout & Orders</h1>
+        <p>Confirm your delivery details and track past orders.</p>
+      </div>
 
-      <div className="card">
-        <input type="text" placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} />
-        <input type="text" placeholder="Phone" value={phone} onChange={(e) => setPhone(e.target.value)} />
-        <input type="text" placeholder="Address" value={address} onChange={(e) => setAddress(e.target.value)} />
+      <div className="checkout-layout">
+        <div className="checkout-form">
+          <h3>Delivery Details</h3>
+          <label>Full Name</label>
+          <input type="text" placeholder="Full name" value={name} onChange={(e) => setName(e.target.value)} />
 
-        <p><b>Total Amount:</b> Rs. {total}</p>
+          <label>Phone</label>
+          <input type="text" placeholder="Phone number" value={phone} onChange={(e) => setPhone(e.target.value)} />
 
-        <div className="btn-block">
-          <button className="btn-success" onClick={placeOrder}>Place Order</button>
+          <label>Address</label>
+          <input type="text" placeholder="Delivery address" value={address} onChange={(e) => setAddress(e.target.value)} />
+
+          <div className="summary-row summary-total">
+            <span>Amount Payable</span>
+            <span>Rs. {formatPrice(total)}</span>
+          </div>
+
+          <button className="btn btn-primary btn-block" onClick={placeOrder}>
+            Place Order
+          </button>
         </div>
       </div>
 
-      <hr />
-
-      <h2>My Orders</h2>
-
-      <div className="grid">
-        {orders.map((order) => (
-          <div className="card order-card" key={order.id}>
-            <h3>Order ID: {order.id}</h3>
-            <p><b>Total Amount:</b> Rs. {order.amount}</p>
-            <p><b>Order Status:</b> {order.status}</p>
-            <p><b>Payment Status:</b> {order.paymentStatus}</p>
-
-            {order.paymentStatus === "paid" ? (
-              <p className="paid-text"><b>Payment Completed ✓</b></p>
-            ) : (
-              <button onClick={() => payOrder(order.id)}>Pay</button>
-            )}
-          </div>
-        ))}
+      <div className="page-heading" style={{ marginTop: "40px" }}>
+        <h2>Order History</h2>
       </div>
+
+      {orders.length === 0 ? (
+        <div className="empty-state">
+          <p>No orders yet — place your first order above.</p>
+        </div>
+      ) : (
+        <div className="order-list">
+          {orders.map((order) => (
+            <div className="order-card" key={order.id}>
+              <div className="order-card-header">
+                <h3>Order #{order.id}</h3>
+                <span className={`status-pill ${order.paymentStatus === "paid" ? "status-paid" : "status-unpaid"}`}>
+                  {order.paymentStatus}
+                </span>
+              </div>
+              <p className="order-amount">Rs. {formatPrice(order.amount)}</p>
+              <p className="order-status-line">Status: {order.status}</p>
+
+              {order.paymentStatus !== "paid" && (
+                <button className="btn btn-primary" onClick={() => payOrder(order.id)}>
+                  Pay Now
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

@@ -17,7 +17,6 @@ export function logout() {
   localStorage.removeItem("userId");
 }
 
-// common headers jo token bhejte hain
 export function authHeaders(withJson = true) {
   const headers = {
     "Authorization": getToken()
@@ -26,4 +25,9 @@ export function authHeaders(withJson = true) {
     headers["Content-Type"] = "application/json";
   }
   return headers;
+}
+
+// turns 1500 into "1,500" for nicer price display
+export function formatPrice(value) {
+  return Number(value).toLocaleString("en-IN");
 }
