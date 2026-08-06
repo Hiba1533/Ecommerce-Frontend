@@ -533,6 +533,72 @@ input:focus, select:focus {
   color: var(--color-accent-dark);
 }
 
+.status-refund_requested {
+  background: #E8EAF6;
+  color: #3949AB;
+}
+
+.status-refunded {
+  background: #E0E0E0;
+  color: #555555;
+}
+
+/* ----- Admin tables ----- */
+.table-wrap {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+  margin-top: 24px;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.admin-table th {
+  text-align: left;
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 14px 20px;
+  background: var(--color-primary-light);
+  border-bottom: 1px solid var(--color-border);
+  white-space: nowrap;
+}
+
+.admin-table td {
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: middle;
+  color: var(--color-text);
+}
+
+.admin-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.admin-table tbody tr:hover {
+  background: var(--color-bg);
+}
+
+.admin-table select {
+  width: auto;
+  padding: 6px 10px;
+  font-size: 13px;
+}
+
+.admin-table .btn {
+  padding: 6px 14px;
+  font-size: 13px;
+}
+
 /* ----- Manage store dashboard ----- */
 .dashboard-layout {
   display: grid;

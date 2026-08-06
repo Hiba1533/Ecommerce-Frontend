@@ -56,6 +56,7 @@ function Navbar() {
             <>
               <Link to="/manage-products">Manage Store</Link>
               <Link to="/admin/users">Admin Users</Link>
+              <Link to="/admin/orders">Admin Orders</Link>
             </>
           )}
 

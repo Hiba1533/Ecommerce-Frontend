@@ -75,6 +75,20 @@ function Orders() {
     }
   }
 
+  // NEW: user clicks "Request Refund"
+  async function requestRefund(orderId) {
+    const response = await apiFetch(`/orders/${orderId}/request-refund`, {
+      method: "PUT"
+    })
+
+    if (response.ok) {
+      alert("Refund requested! Admin will review it.")
+      loadOrders(user.id)
+    } else {
+      alert(await response.text())
+    }
+  }
+
   return (
     <div className="page-container">
       <div className="page-heading">
@@ -119,17 +133,31 @@ function Orders() {
             <div className="order-card" key={order.id}>
               <div className="order-card-header">
                 <h3>Order #{order.id}</h3>
-                <span className={`status-pill ${order.paymentStatus === "paid" ? "status-paid" : "status-unpaid"}`}>
+                <span className={`status-pill status-${order.paymentStatus}`}>
                   {order.paymentStatus}
                 </span>
               </div>
               <p className="order-amount">Rs. {formatPrice(order.amount)}</p>
               <p className="order-status-line">Status: {order.status}</p>
 
-              {order.paymentStatus !== "paid" && (
+              {order.paymentStatus === "unpaid" && (
                 <button className="btn btn-primary" onClick={() => payOrder(order.id)}>
                   Pay Now
                 </button>
+              )}
+
+              {order.paymentStatus === "paid" && (
+                <button className="btn btn-outline" onClick={() => requestRefund(order.id)}>
+                  Request Refund
+                </button>
+              )}
+
+              {order.paymentStatus === "refund_requested" && (
+                <p className="order-status-line">Refund requested, waiting for admin.</p>
+              )}
+
+              {order.paymentStatus === "refunded" && (
+                <p className="order-status-line">This order has been refunded.</p>
               )}
             </div>
           ))}

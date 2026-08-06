@@ -9,6 +9,7 @@ import Cart from './pages/Cart.jsx'
 import Orders from './pages/Orders.jsx'
 import ManageProducts from './pages/ManageProducts.jsx'
 import AdminUsers from './pages/AdminUsers.jsx'
+import AdminOrders from './pages/AdminOrders.jsx'
 
 function App() {
   return (
@@ -28,6 +29,10 @@ function App() {
           <Route
             path="/admin/users"
             element={<AdminRoute><AdminUsers /></AdminRoute>}
+          />
+          <Route
+            path="/admin/orders"
+            element={<AdminRoute><AdminOrders /></AdminRoute>}
           />
         </Routes>
       </main>

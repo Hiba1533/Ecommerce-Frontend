@@ -85,7 +85,8 @@ function AdminUsers() {
         <p>View, promote or remove user accounts.</p>
       </div>
 
-      <table className="admin-table">
+      <div className="table-wrap">
+        <table className="admin-table">
 
         <thead>
           <tr>
@@ -137,11 +138,11 @@ function AdminUsers() {
         </tbody>
 
       </table>
+      </div>
 
     </div>
 
   )
-
 }
 
 export default AdminUsers
