@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { BASE_URL } from '../api.js'
+import { useNavigate, Link } from 'react-router-dom'
+import { apiFetch } from '../api.js'
 
 function Login() {
   const [email, setEmail] = useState("")
@@ -8,27 +8,19 @@ function Login() {
   const navigate = useNavigate()
 
   async function handleLogin() {
-    const response = await fetch(BASE_URL + "/auth/login", {
+    const response = await apiFetch("/auth/login", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
       body: JSON.stringify({ email, password })
     })
 
-    if (response.ok) {
-      const token = response.headers.get("Authorization")
-      const userId = response.headers.get("User-Id")
-
-      localStorage.setItem("token", token)
-      localStorage.setItem("userId", userId)
-
-      const message = await response.text()
-      alert(message)
-      navigate("/products")
-    } else {
+    if (!response.ok) {
       const error = await response.text()
       alert(error)
+      return
     }
+
+    // Cookie is set by the browser automatically now — just go.
+    navigate("/products")
   }
 
   return (
@@ -36,7 +28,6 @@ function Login() {
       <div className="auth-panel">
         <h1>Everyday essentials,<br />sorted in one cart.</h1>
         <p>Browse products, track orders, and check out — all in one place.</p>
-
         <ul className="auth-feature-list">
           <li>Save items to your cart</li>
           <li>Track every order in real time</li>

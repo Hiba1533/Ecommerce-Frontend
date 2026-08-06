@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { BASE_URL, getUserId, authHeaders, formatPrice } from '../api.js'
+import { apiFetch, fetchCurrentUser, formatPrice } from '../api.js'
 
 function Orders() {
   const [name, setName] = useState("")
@@ -8,23 +8,24 @@ function Orders() {
   const [address, setAddress] = useState("")
   const [total, setTotal] = useState(0)
   const [orders, setOrders] = useState([])
+  const [user, setUser] = useState(null)
   const navigate = useNavigate()
-  const userId = getUserId()
 
   useEffect(() => {
-    if (!userId) {
-      alert("Please login first")
-      navigate("/")
-      return
-    }
-    loadTotal()
-    loadOrders()
+    fetchCurrentUser().then((u) => {
+      if (!u) {
+        alert("Please login first")
+        navigate("/")
+        return
+      }
+      setUser(u)
+      loadTotal(u.id)
+      loadOrders(u.id)
+    })
   }, [])
 
-  async function loadTotal() {
-    const response = await fetch(`${BASE_URL}/cart/total/${userId}`, {
-      headers: authHeaders(false)
-    })
+  async function loadTotal(userId) {
+    const response = await apiFetch(`/cart/total/${userId}`)
     if (response.ok) {
       const data = await response.json()
       setTotal(data)
@@ -33,10 +34,8 @@ function Orders() {
     }
   }
 
-  async function loadOrders() {
-    const response = await fetch(`${BASE_URL}/orders/${userId}`, {
-      headers: authHeaders(false)
-    })
+  async function loadOrders(userId) {
+    const response = await apiFetch(`/orders/${userId}`)
     if (!response.ok) {
       alert("Unable to load orders")
       return
@@ -46,9 +45,8 @@ function Orders() {
   }
 
   async function placeOrder() {
-    const response = await fetch(`${BASE_URL}/orders/${userId}`, {
+    const response = await apiFetch(`/orders/${user.id}`, {
       method: "POST",
-      headers: authHeaders(),
       body: JSON.stringify({ name, phone, address })
     })
 
@@ -57,22 +55,21 @@ function Orders() {
       setName("")
       setPhone("")
       setAddress("")
-      loadTotal()
-      loadOrders()
+      loadTotal(user.id)
+      loadOrders(user.id)
     } else {
       alert(await response.text())
     }
   }
 
   async function payOrder(orderId) {
-    const response = await fetch(`${BASE_URL}/orders/${orderId}/pay`, {
-      method: "PUT",
-      headers: authHeaders(false)
+    const response = await apiFetch(`/orders/${orderId}/pay`, {
+      method: "PUT"
     })
 
     if (response.ok) {
       alert("Payment successful!")
-      loadOrders()
+      loadOrders(user.id)
     } else {
       alert("Payment failed!")
     }

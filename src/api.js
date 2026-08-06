@@ -1,33 +1,33 @@
 export const BASE_URL = "http://localhost:8080";
 
-export function getToken() {
-  return localStorage.getItem("token");
+// Central fetch wrapper — every request goes through here, so
+// credentials: "include" (send the HttpOnly cookie) never gets missed.
+export async function apiFetch(path, options = {}) {
+  return fetch(BASE_URL + path, {
+    ...options,
+    credentials: "include",
+    headers: {
+      ...(options.body ? { "Content-Type": "application/json" } : {}),
+      ...(options.headers || {})
+    }
+  });
 }
 
-export function getUserId() {
-  return localStorage.getItem("userId");
-}
-
-export function isLoggedIn() {
-  return !!getUserId();
-}
-
-export function logout() {
-  localStorage.removeItem("token");
-  localStorage.removeItem("userId");
-}
-
-export function authHeaders(withJson = true) {
-  const headers = {
-    "Authorization": getToken()
-  };
-  if (withJson) {
-    headers["Content-Type"] = "application/json";
+// Returns { id, username, email, role } if logged in, or null if not.
+export async function fetchCurrentUser() {
+  try {
+    const response = await apiFetch("/auth/me");
+    if (!response.ok) return null;
+    return await response.json();
+  } catch {
+    return null;
   }
-  return headers;
 }
 
-// turns 1500 into "1,500" for nicer price display
+export async function logoutRequest() {
+  await apiFetch("/auth/logout", { method: "POST" });
+}
+
 export function formatPrice(value) {
   return Number(value).toLocaleString("en-IN");
 }

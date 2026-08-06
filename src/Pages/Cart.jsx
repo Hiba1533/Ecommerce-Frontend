@@ -1,28 +1,29 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { BASE_URL, getUserId, authHeaders, formatPrice } from '../api.js'
+import { apiFetch, fetchCurrentUser, formatPrice } from '../api.js'
 
 function Cart() {
   const [items, setItems] = useState([])
   const [total, setTotal] = useState(0)
   const [quantities, setQuantities] = useState({})
+  const [user, setUser] = useState(null)
   const navigate = useNavigate()
-  const userId = getUserId()
 
   useEffect(() => {
-    if (!userId) {
-      alert("Please login first")
-      navigate("/")
-      return
-    }
-    loadCart()
-    loadTotal()
+    fetchCurrentUser().then((u) => {
+      if (!u) {
+        alert("Please login first")
+        navigate("/")
+        return
+      }
+      setUser(u)
+      loadCart(u.id)
+      loadTotal(u.id)
+    })
   }, [])
 
-  async function loadCart() {
-    const response = await fetch(`${BASE_URL}/cart/items/${userId}`, {
-      headers: authHeaders(false)
-    })
+  async function loadCart(userId) {
+    const response = await apiFetch(`/cart/items/${userId}`)
 
     if (!response.ok) {
       alert("Error : " + response.status)
@@ -37,10 +38,8 @@ function Cart() {
     setQuantities(qtyMap)
   }
 
-  async function loadTotal() {
-    const response = await fetch(`${BASE_URL}/cart/total/${userId}`, {
-      headers: authHeaders(false)
-    })
+  async function loadTotal(userId) {
+    const response = await apiFetch(`/cart/total/${userId}`)
     if (!response.ok) return
     const data = await response.json()
     setTotal(data)
@@ -55,28 +54,26 @@ function Cart() {
   async function updateQuantity(cartItemId) {
     const quantity = quantities[cartItemId]
 
-    const response = await fetch(`${BASE_URL}/cart/items/${cartItemId}?quantity=${quantity}`, {
-      method: "PUT",
-      headers: authHeaders(false)
+    const response = await apiFetch(`/cart/items/${cartItemId}?quantity=${quantity}`, {
+      method: "PUT"
     })
 
     if (response.ok) {
-      loadCart()
-      loadTotal()
+      loadCart(user.id)
+      loadTotal(user.id)
     } else {
       alert(await response.text())
     }
   }
 
   async function deleteItem(cartItemId) {
-    const response = await fetch(`${BASE_URL}/cart/items/${cartItemId}`, {
-      method: "DELETE",
-      headers: authHeaders(false)
+    const response = await apiFetch(`/cart/items/${cartItemId}`, {
+      method: "DELETE"
     })
 
     if (response.ok) {
-      loadCart()
-      loadTotal()
+      loadCart(user.id)
+      loadTotal(user.id)
     } else {
       alert(await response.text())
     }

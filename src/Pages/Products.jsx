@@ -1,25 +1,28 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { BASE_URL, getUserId, getToken, formatPrice } from '../api.js'
+import { apiFetch, fetchCurrentUser, formatPrice } from '../api.js'
 
 function Products() {
   const [products, setProducts] = useState([])
   const [quantities, setQuantities] = useState({})
   const [activeCategory, setActiveCategory] = useState("All")
+  const [user, setUser] = useState(null)
   const navigate = useNavigate()
-  const userId = getUserId()
 
   useEffect(() => {
-    if (!userId) {
-      alert("Please login first")
-      navigate("/")
-      return
-    }
-    loadProducts()
+    fetchCurrentUser().then((u) => {
+      if (!u) {
+        alert("Please login first")
+        navigate("/")
+        return
+      }
+      setUser(u)
+      loadProducts()
+    })
   }, [])
 
   async function loadProducts() {
-    const response = await fetch(BASE_URL + "/product")
+    const response = await apiFetch("/product")
     if (!response.ok) {
       alert("Unable to load products")
       return
@@ -48,14 +51,12 @@ function Products() {
   }
 
   async function addToCart(productId) {
+    if (!user) return
     const quantity = getQty(productId)
 
-    const response = await fetch(
-      `${BASE_URL}/cart/items?userId=${userId}&productId=${productId}&quantity=${quantity}`,
-      {
-        method: "POST",
-        headers: { "Authorization": getToken() }
-      }
+    const response = await apiFetch(
+      `/cart/items?userId=${user.id}&productId=${productId}&quantity=${quantity}`,
+      { method: "POST" }
     )
 
     if (response.ok) {

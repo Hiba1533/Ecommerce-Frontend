@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
-import { BASE_URL } from '../api.js'
+import { apiFetch } from '../api.js'
 
 function ManageProducts() {
+
   const [categories, setCategories] = useState([])
   const [categoryName, setCategoryName] = useState("")
 
@@ -16,110 +17,185 @@ function ManageProducts() {
   }, [])
 
   async function loadCategories() {
-    const response = await fetch(BASE_URL + "/category")
+
+    const response = await apiFetch("/category")
     const data = await response.json()
+
     setCategories(data)
+
     if (data.length > 0 && !categoryId) {
       setCategoryId(data[0].id)
     }
   }
 
   async function addCategory() {
-    const response = await fetch(BASE_URL + "/category", {
+
+    const response = await apiFetch("/category", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name: categoryName })
     })
 
     if (response.ok) {
+
       alert("Category Added")
+
       setCategoryName("")
+
       loadCategories()
+
     } else {
-      alert("Failed")
+
+      alert("Failed — check you're logged in as ADMIN")
+
     }
   }
 
   async function addProduct() {
+
     const product = {
       name,
       description,
       price,
       stock,
-      category: { id: categoryId }
+      category: {
+        id: categoryId
+      }
     }
 
-    const response = await fetch(BASE_URL + "/product", {
+    const response = await apiFetch("/product", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(product)
     })
 
     if (response.ok) {
+
       alert("Product Added Successfully")
+
       setName("")
       setDescription("")
       setPrice("")
       setStock("")
+
     } else {
+
       const error = await response.text()
       alert(error)
+
     }
   }
 
   return (
     <div className="page-container">
+
       <div className="page-heading">
         <h1>Manage Store</h1>
         <p>Add new categories and products to the catalogue.</p>
       </div>
 
       <div className="dashboard-layout">
+
         <div className="dashboard-card">
+
           <h3>Add Category</h3>
+
           <label>Category Name</label>
+
           <input
             type="text"
             placeholder="e.g. Snacks"
             value={categoryName}
             onChange={(e) => setCategoryName(e.target.value)}
           />
-          <button className="btn btn-primary btn-block" onClick={addCategory}>
+
+          <button
+            className="btn btn-primary btn-block"
+            onClick={addCategory}
+          >
             Add Category
           </button>
+
         </div>
 
         <div className="dashboard-card">
+
           <h3>Add Product</h3>
+
           <label>Product Name</label>
-          <input type="text" placeholder="Product name" value={name} onChange={(e) => setName(e.target.value)} />
+
+          <input
+            type="text"
+            placeholder="Product name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
 
           <label>Description</label>
-          <input type="text" placeholder="Short description" value={description} onChange={(e) => setDescription(e.target.value)} />
+
+          <input
+            type="text"
+            placeholder="Short description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+          />
 
           <div className="form-row">
+
             <div>
+
               <label>Price</label>
-              <input type="number" placeholder="0" value={price} onChange={(e) => setPrice(e.target.value)} />
+
+              <input
+                type="number"
+                placeholder="0"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+              />
+
             </div>
+
             <div>
+
               <label>Stock</label>
-              <input type="number" placeholder="0" value={stock} onChange={(e) => setStock(e.target.value)} />
+
+              <input
+                type="number"
+                placeholder="0"
+                value={stock}
+                onChange={(e) => setStock(e.target.value)}
+              />
+
             </div>
+
           </div>
 
           <label>Category</label>
-          <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)}>
+
+          <select
+            value={categoryId}
+            onChange={(e) => setCategoryId(e.target.value)}
+          >
+
             {categories.map((cat) => (
-              <option key={cat.id} value={cat.id}>{cat.name}</option>
+
+              <option key={cat.id} value={cat.id}>
+                {cat.name}
+              </option>
+
             ))}
+
           </select>
 
-          <button className="btn btn-primary btn-block" onClick={addProduct}>
+          <button
+            className="btn btn-primary btn-block"
+            onClick={addProduct}
+          >
             Add Product
           </button>
+
         </div>
+
       </div>
+
     </div>
   )
 }
